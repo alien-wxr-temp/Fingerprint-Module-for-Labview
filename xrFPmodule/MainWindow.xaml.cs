@@ -27,6 +27,18 @@ namespace xrFPmodule
         public MainWindow()
         {
             InitializeComponent();
+            Init();
+        }
+
+        public void Init()
+        {
+            mydata = new Data();
+            mydata.folderPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "data";
+            mydata.logPath = mydata.folderPath + "\\dataLog.txt";
+            if (!System.IO.Directory.Exists(mydata.folderPath))
+                System.IO.Directory.CreateDirectory(mydata.folderPath);
+            if (!System.IO.File.Exists(mydata.logPath))
+                System.IO.File.Create(mydata.logPath);
         }
 
         private void EnrollButton_Click(object sender, RoutedEventArgs e)
@@ -63,5 +75,6 @@ namespace xrFPmodule
         }
 
         private new DPFP.Template Template;
+        private Data mydata;
     }
 }
