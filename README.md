@@ -23,3 +23,7 @@ A Fingerprint module
 - Started writing log.
 - The sample referred previously used a special Event handler to update event notifications, which would cause an unhandled exception when trying to change the save method.
 - Fixed the problem of meeting an unhandled exception.
+- Added ***Data.cs*** into the project.
+- Finished a function to automatically create a ***data*** Folder and a ***dataLog.txt*** file under the current directory of the ***.exe*** file.
+### Unsolved problems:
+- More functions on the R/W of dataStream.
