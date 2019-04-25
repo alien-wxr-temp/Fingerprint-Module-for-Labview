@@ -23,6 +23,8 @@ namespace xrFPmodule
     {
         public const int MaxTemplates = 100;
         // shared data
+        public string folderPath;
+        public string logPath;
         public int EnrolledFingersMask = 0;
         public int MaxEnrollFingerCount = MaxTemplates;
         public bool IsEventHandlerSucceeds = true;
