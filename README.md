@@ -3,9 +3,9 @@ A Fingerprint module
 # Goals
 - 
 # Log
-### *[2019-04-22 Monday]*
+## *[2019-04-22 Monday]*
 - Got familiar with the two samples based on **C#**.
-### *[2019-04-23 Tuesday]*
+## *[2019-04-23 Tuesday]*
 - Created a new solution based on **WPF App (.NET Framework 4)**, while the sample is based on **WinForm**.
 - Got start with the WPF.
 - Finished the ui of the Enrollment Window by using ***XAML*** language.
