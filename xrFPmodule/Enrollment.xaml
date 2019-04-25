@@ -32,9 +32,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBox Margin="0,0,0,15" 
-                     TextWrapping="Wrap" Name="statusTextBox"
-                     Text="status init" IsReadOnly="True">
+                <TextBox Margin="0,0,0,15" Name="statusTextBox" 
+                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                         Text="status init" IsReadOnly="True">
                 </TextBox>
                 <Label Name="statusLabel" Content="Ready"
                        Margin="0,0,0,-6" Height="26" VerticalAlignment="Bottom">
