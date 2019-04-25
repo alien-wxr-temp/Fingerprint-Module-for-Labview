@@ -76,7 +76,6 @@ namespace xrFPmodule
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
-                            //this.closeAndsaveButton.IsEnabled = true;
                             OnTemplate(Enroller.Template);
                             SetPrompt("Click Close, and then click Fingerprint Verification.");
                             Stop();
@@ -149,7 +148,7 @@ namespace xrFPmodule
                     Enroller.Template.Serialize(fs);
                 }
             }
-            //this.Close();
+            this.Close();
         }
 
         #endregion
@@ -225,6 +224,8 @@ namespace xrFPmodule
             this.Dispatcher.Invoke(new Action(delegate
             {
                 promptTextBox.Text = prompt;
+                if (prompt == "Click Close, and then click Fingerprint Verification.")
+                    this.closeAndsaveButton.IsEnabled = true;
             }));
         }
         protected void MakeReport(string message)
@@ -232,6 +233,7 @@ namespace xrFPmodule
             this.Dispatcher.Invoke(new Action(delegate
             {
                 statusTextBox.AppendText(message + "\r\n");
+                statusTextBox.ScrollToEnd();
             }));
         }
 
