@@ -24,13 +24,21 @@ namespace xrFPmodule
 
     public partial class MainWindow : Window
     {
+        private new DPFP.Template Template;
+        public Data mydata;
+        private Enrollment enroller;
+        private Verification verify;
+
         public MainWindow()
         {
             InitializeComponent();
-            Init();
+            this.confirmButton.IsEnabled = false;
+            this.enrollButton.IsEnabled = false;
+            this.verifyButton.IsEnabled = false;
+            this.closeAndSaveButton.IsEnabled = false;
         }
 
-        public void Init()
+        public void dataInit()
         {
             mydata = new Data();
             mydata.folderPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "data";
@@ -38,13 +46,49 @@ namespace xrFPmodule
             if (!System.IO.Directory.Exists(mydata.folderPath))
                 System.IO.Directory.CreateDirectory(mydata.folderPath);
             if (!System.IO.File.Exists(mydata.logPath))
+            {
                 System.IO.File.Create(mydata.logPath);
+            }
+            else
+            {
+                // Read dataLog.txt
+                using (StreamReader sr = new StreamReader(mydata.logPath))
+                {
+                    database user = new database();
+                    mydata.userNum = Convert.ToInt32(sr.ReadLine());
+                    while (!sr.EndOfStream)
+                    {
+                        user.username = sr.ReadLine();
+                        user.fpNum = Convert.ToInt32(sr.ReadLine());
+                        mydata.userList.Add(user);
+                    }
+                }
+
+                // Read .fpt files
+                for (int i=0; i<mydata.userNum; i++)
+                {
+                    for (int j=0; j<mydata.userList[i].fpNum; j++)
+                    {
+                        string fName = mydata.folderPath + "\\";
+                        fName += string.Format("{0:0000}", i + 1);
+                        fName += string.Format("{0:0000}", j + 1);
+                        fName += ".fpt";
+                        using (FileStream fs = File.OpenRead(fName))
+                        {
+                            DPFP.Template template = new DPFP.Template(fs);
+                            mydata.Templates[mydata.serialNum++] = template;
+                            string name = mydata.userList[i].username;
+                            mydata.serialName.Add(name);
+                        }
+                    }
+                }
+            }
         }
 
         private void EnrollButton_Click(object sender, RoutedEventArgs e)
         {
-            //Enrollment
-            Enrollment enroller = new Enrollment();
+            // Enrollment Window
+            enroller = new Enrollment(mydata);
             enroller.OnTemplate += this.OnTemplate;
             enroller.ShowDialog();
         }
@@ -61,20 +105,41 @@ namespace xrFPmodule
             }));
         }
 
-        private void SaveButton_Click(object sender, RoutedEventArgs e)
+        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog save = new SaveFileDialog();
-            save.Filter = "Fingerprint Template File (*.fpt)|*.fpt";
-            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                using (FileStream fs = File.Open(save.FileName, FileMode.Create, FileAccess.Write))
-                {
-                    Template.Serialize(fs);
-                }
-            }
+            mydata.tempName = this.nameTextBox.Text;
+            this.enrollButton.IsEnabled = true;
         }
 
-        private new DPFP.Template Template;
-        private Data mydata;
+        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
+        {
+            using (FileStream fs = new FileStream(mydata.logPath, FileMode.Create))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.WriteLine(mydata.userNum);
+                    for (int i=0; i<mydata.userNum; i++)
+                    {
+                        sw.WriteLine(mydata.userList[i].username);
+                        sw.WriteLine(mydata.userList[i].fpNum);
+                    }
+                }
+            }
+            this.Close();
+        }
+
+        private void VerifyButton_Click(object sender, RoutedEventArgs e)
+        {
+            verify = new Verification(mydata);
+            verify.ShowDialog();
+        }
+
+        private void InitButton_Click(object sender, RoutedEventArgs e)
+        {
+            dataInit();
+            this.confirmButton.IsEnabled = true;
+            this.verifyButton.IsEnabled = true;
+            this.closeAndSaveButton.IsEnabled = true;
+        }
     }
 }
