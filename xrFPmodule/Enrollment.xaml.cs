@@ -25,15 +25,16 @@ namespace xrFPmodule
 
         public event OnTemplateEventHandler OnTemplate;
 
-        public Enrollment()
+        public Enrollment(Data data)
         {
             InitializeComponent();
+            mydata = data;
         }
 
         protected void Init()
         {
 
-            this.closeAndsaveButton.IsEnabled = false;
+            this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
 
             try
@@ -136,19 +137,41 @@ namespace xrFPmodule
             Start();
         }
 
-        private void CloseAndsaveButton_Click(object sender, RoutedEventArgs e)
+        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
         {
+            int userSeiral = matching();
             //save template
             System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
-            save.Filter = "Fingerprint Template File (*.fpt)|*.fpt";
-            if (save.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            if (userSeiral != -1)
             {
-                using (FileStream fs = File.Open(save.FileName, FileMode.Create, FileAccess.Write))
-                {
-                    Enroller.Template.Serialize(fs);
-                }
+                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", userSeiral + 1);
+                save.FileName += string.Format("{0:0000}", ++mydata.userList[userSeiral].fpNum);
+                save.FileName += ".fpt";
+            }
+            else
+            {
+                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", ++mydata.userNum);
+                save.FileName += "0001.fpt";
+                database user = new database();
+                user.username = mydata.tempName;
+                user.fpNum = 1;
+                mydata.userList.Add(user);
+            }
+            using (FileStream fs = File.Open(save.FileName, FileMode.Create, FileAccess.Write))
+            {
+                Enroller.Template.Serialize(fs);
             }
             this.Close();
+        }
+
+        private int matching()
+        {
+            for (int i=0; i<mydata.userNum; i++)
+            {
+                if (mydata.tempName == mydata.userList[i].username)
+                    return i;
+            }
+            return -1;
         }
 
         #endregion
@@ -225,7 +248,7 @@ namespace xrFPmodule
             {
                 promptTextBox.Text = prompt;
                 if (prompt == "Click Close, and then click Fingerprint Verification.")
-                    this.closeAndsaveButton.IsEnabled = true;
+                    this.closeAndSaveButton.IsEnabled = true;
             }));
         }
         protected void MakeReport(string message)
@@ -244,7 +267,8 @@ namespace xrFPmodule
         }
 
         private DPFP.Processing.Enrollment Enroller;
-
         private DPFP.Capture.Capture Capturer;
+        private Data mydata;
+
     }
 }
