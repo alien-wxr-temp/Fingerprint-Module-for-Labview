@@ -27,3 +27,9 @@ A Fingerprint module
 - Finished a function to automatically create a ***data*** Folder and a ***dataLog.txt*** file under the current directory of the ***.exe*** file.
 ### Unsolved problems:
 - More functions on the R/W of dataStream.
+## *[2019-04-26 Friday]*
+- Finished the function to automatically save ***.fpt*** file and use the username as the filename.
+- Finished the whole basic function on the R/W of dataStream.
+# To do
+- The function of ***Verification***
+- TCP or UDP socket communication with LabView.
