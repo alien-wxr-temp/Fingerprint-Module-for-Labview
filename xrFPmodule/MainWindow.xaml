@@ -37,13 +37,33 @@
         </TextBox>
 
         <!-- Save Button -->
-        <Button Content="Save" Name="saveButton" Grid.Column="0"  VerticalAlignment="Top"
+        <Button Content="Confirm" Name="confirmButton" Grid.Column="0"  VerticalAlignment="Top"
                 Margin="10,40,10,0" Height="24"
-                Click="SaveButton_Click"/>
+                Click="ConfirmButton_Click">
+        </Button>
+
+        <!-- Initialize Button -->
+        <Button Grid.Column="0" Content="Initialize" Name="initButton" 
+                Margin="10,10,10,100" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
+                Click="InitButton_Click">
+        </Button>
 
         <!-- Enrollment Button -->
-        <Button Grid.Column="0" Content="Enrollment"
-                Margin="10,10,10,10" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
-                Click="EnrollButton_Click"/>
+        <Button Grid.Column="0" Content="Enrollment" Name="enrollButton" 
+                Margin="10,10,10,70" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
+                Click="EnrollButton_Click">
+        </Button>
+
+        <!-- Verification Button -->
+        <Button Grid.Column="0" Content="Verification" Name="verifyButton" 
+                Margin="10,10,10,40" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
+                Click="VerifyButton_Click">
+        </Button>
+
+        <!-- Close and Save Button -->
+        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"
+                Margin="10,10,10,10" Grid.Row="1" VerticalAlignment="Bottom" Height="24"
+                Click="CloseAndSaveButton_Click">
+        </Button>
     </Grid>
 </Window>
