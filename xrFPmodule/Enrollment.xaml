@@ -43,9 +43,9 @@
         </GroupBox>
 
         <!-- Close & Save Button -->
-        <Button Content="Close and Save" Name="closeAndsaveButton" Grid.Column="0"  VerticalAlignment="Bottom"
+        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"  VerticalAlignment="Bottom"
                 Margin="10,40,10,5" Height="24"
-                Click="CloseAndsaveButton_Click">
+                Click="CloseAndSaveButton_Click">
         </Button>
 
     </Grid>
