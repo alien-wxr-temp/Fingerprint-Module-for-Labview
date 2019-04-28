@@ -63,11 +63,12 @@ namespace xrFPmodule
         {
             using (StreamReader sr = new StreamReader(mydata.logPath))
             {
-                database user = new database();
                 mydata.userNum = Convert.ToInt32(sr.ReadLine());
-                while (!sr.EndOfStream)
+                string line;
+                while ((line=sr.ReadLine())!=null)
                 {
-                    user.username = sr.ReadLine();
+                    database user = new database();
+                    user.username = line;
                     user.fpNum = Convert.ToInt32(sr.ReadLine());
                     mydata.userList.Add(user);
                 }
@@ -136,15 +137,16 @@ namespace xrFPmodule
 
         private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
         {
+            File.Delete(mydata.logPath);
             using (FileStream fs = new FileStream(mydata.logPath, FileMode.Create))
             {
                 using (StreamWriter sw = new StreamWriter(fs))
                 {
                     sw.WriteLine(mydata.userNum);
-                    for (int i=0; i<mydata.userNum; i++)
+                    foreach (database user in mydata.userList)
                     {
-                        sw.WriteLine(mydata.userList[i].username);
-                        sw.WriteLine(mydata.userList[i].fpNum);
+                        sw.WriteLine(user.username);
+                        sw.WriteLine(user.fpNum);
                     }
                 }
             }
