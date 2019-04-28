@@ -30,6 +30,8 @@ A Fingerprint module
 ## *[2019-04-26 Friday]*
 - Finished the function to automatically save ***.fpt*** file and use the username as the filename.
 - Finished the whole basic function on the R/W of dataStream.
+## *【2019-04-28 Sunday]*
+- Finished the function of ***Verification***
+- Found and fixed a problem about the ***dataLog.txt***
 # To do
-- The function of ***Verification***
 - TCP or UDP socket communication with LabView.
