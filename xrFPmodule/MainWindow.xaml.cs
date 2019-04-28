@@ -41,6 +41,8 @@ namespace xrFPmodule
         public void dataInit()
         {
             mydata = new Data();
+            mydata.OnChange += delegate { ExchangeData(false); };	// Track data changes to keep the form synchronized
+            ExchangeData(false);								// fill data with default values from controls
             mydata.folderPath = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "data";
             mydata.logPath = mydata.folderPath + "\\dataLog.txt";
             if (!System.IO.Directory.Exists(mydata.folderPath))
@@ -51,37 +53,58 @@ namespace xrFPmodule
             }
             else
             {
-                // Read dataLog.txt
-                using (StreamReader sr = new StreamReader(mydata.logPath))
-                {
-                    database user = new database();
-                    mydata.userNum = Convert.ToInt32(sr.ReadLine());
-                    while (!sr.EndOfStream)
-                    {
-                        user.username = sr.ReadLine();
-                        user.fpNum = Convert.ToInt32(sr.ReadLine());
-                        mydata.userList.Add(user);
-                    }
-                }
+                mySR();
+                mySW();
+            }
+        }
 
-                // Read .fpt files
-                for (int i=0; i<mydata.userNum; i++)
+        // Read dataLog.txt
+        private void mySR()
+        {
+            using (StreamReader sr = new StreamReader(mydata.logPath))
+            {
+                database user = new database();
+                mydata.userNum = Convert.ToInt32(sr.ReadLine());
+                while (!sr.EndOfStream)
                 {
-                    for (int j=0; j<mydata.userList[i].fpNum; j++)
+                    user.username = sr.ReadLine();
+                    user.fpNum = Convert.ToInt32(sr.ReadLine());
+                    mydata.userList.Add(user);
+                }
+            }
+        }
+
+        // Read .fpt files
+        private void mySW()
+        {
+            for (int i = 0; i < mydata.userNum; i++)
+            {
+                for (int j = 0; j < mydata.userList[i].fpNum; j++)
+                {
+                    string fName = mydata.folderPath + "\\";
+                    fName += string.Format("{0:0000}", i);
+                    fName += string.Format("{0:0000}", j + 1);
+                    fName += ".fpt";
+                    using (FileStream fs = File.OpenRead(fName))
                     {
-                        string fName = mydata.folderPath + "\\";
-                        fName += string.Format("{0:0000}", i + 1);
-                        fName += string.Format("{0:0000}", j + 1);
-                        fName += ".fpt";
-                        using (FileStream fs = File.OpenRead(fName))
-                        {
-                            DPFP.Template template = new DPFP.Template(fs);
-                            mydata.Templates[mydata.serialNum++] = template;
-                            string name = mydata.userList[i].username;
-                            mydata.serialName.Add(name);
-                        }
+                        DPFP.Template template = new DPFP.Template(fs);
+                        mydata.Templates[mydata.serialNum++] = template;
+                        string name = mydata.userList[i].username;
+                        mydata.serialName.Add(name);
                     }
                 }
+            }
+        }
+
+        // Simple dialog data exchange (DDX) implementation.
+        private void ExchangeData(bool read)
+        {
+            if (read)
+            {   // read values from the form's controls to the data object
+                mydata.Update();
+            }
+            else
+            {   // read valuse from the data object to the form's controls
             }
         }
 
