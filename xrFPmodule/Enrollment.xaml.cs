@@ -144,13 +144,13 @@ namespace xrFPmodule
             System.Windows.Forms.SaveFileDialog save = new System.Windows.Forms.SaveFileDialog();
             if (userSeiral != -1)
             {
-                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", userSeiral + 1);
+                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", userSeiral);
                 save.FileName += string.Format("{0:0000}", ++mydata.userList[userSeiral].fpNum);
                 save.FileName += ".fpt";
             }
             else
             {
-                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", ++mydata.userNum);
+                save.FileName = mydata.folderPath + "\\" + string.Format("{0:0000}", mydata.userNum++);
                 save.FileName += "0001.fpt";
                 database user = new database();
                 user.username = mydata.tempName;
