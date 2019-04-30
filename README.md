@@ -32,6 +32,6 @@ A Fingerprint module
 - Finished the function of ***Verification***.
 - Found and fixed a problem about the ***dataLog.txt***.
 ## *[2019-04-29 Monday]*
-- Designed the dataStream for the ***TCP Communication***.
+- Finished a simple communication between a ***C#*** **TCP Server** ***DEMO*** and a ***LabView*** **TCP Client** ***DEMO***.
 # To do
 - ***TCP Communication*** with LabView.
