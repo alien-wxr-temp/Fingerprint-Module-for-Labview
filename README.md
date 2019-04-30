@@ -33,5 +33,7 @@ A Fingerprint module
 - Found and fixed a problem about the ***dataLog.txt***.
 ## *[2019-04-29 Monday]*
 - Finished a simple communication between a ***C#*** **TCP Server** ***DEMO*** and a ***LabView*** **TCP Client** ***DEMO***.
+## *[2019-04-30 Tuesday]*
+- 
 # To do
 - ***TCP Communication*** with LabView.
