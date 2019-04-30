@@ -1,7 +1,5 @@
 # Taurus-xrFPmodule
 A Fingerprint module
-# Goals
-- 
 # Log
 ## *[2019-04-22 Monday]*
 - Got familiar with the two samples based on **C#**.
@@ -17,7 +15,7 @@ A Fingerprint module
 ## *[2019-04-24 Wednesday]*
 - Tried to automatically save the ***.fpt*** file with the target name when clicking the ***Close and Save*** button in the Enrollment Window, but meeting the problem of the System Exception.
 ### Unsolved Problems:
-- Cannot automatically save the ***.fpt*** file with the target name when clicking the ***Close and Save*** button in the Enrollment Window
+- Cannot automatically save the ***.fpt*** file with the target name when clicking the ***Close and Save*** button in the Enrollment Window.
 ## *[2019-04-25 Thursday]*
 - Added the source control to the solution.
 - Started writing log.
@@ -30,8 +28,10 @@ A Fingerprint module
 ## *[2019-04-26 Friday]*
 - Finished the function to automatically save ***.fpt*** file and use the username as the filename.
 - Finished the whole basic function on the R/W of dataStream.
-## *【2019-04-28 Sunday]*
-- Finished the function of ***Verification***
-- Found and fixed a problem about the ***dataLog.txt***
+## *[2019-04-28 Sunday]*
+- Finished the function of ***Verification***.
+- Found and fixed a problem about the ***dataLog.txt***.
+## *[2019-04-29 Monday]*
+- Designed the dataStream for the ***TCP Communication***.
 # To do
-- TCP or UDP socket communication with LabView.
+- ***TCP Communication*** with LabView.
