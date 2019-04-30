@@ -42,6 +42,24 @@
                 Click="ConfirmButton_Click">
         </Button>
 
+        <!-- TCP Status Group -->
+        <GroupBox Margin="10,70,10,130">
+            <GroupBox.Header>
+                <Label Content="TCP Status"/>
+            </GroupBox.Header>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition/>
+                </Grid.ColumnDefinitions>
+
+                <!-- TCP Status TextBox -->
+                <TextBox Name="tcpStatusTextBox"
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto">
+                </TextBox>
+            </Grid>
+        </GroupBox>
+
         <!-- Initialize Button -->
         <Button Grid.Column="0" Content="Initialize" Name="initButton" 
                 Margin="10,10,10,100" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
@@ -65,23 +83,5 @@
                 Margin="10,10,10,10" Grid.Row="1" VerticalAlignment="Bottom" Height="24"
                 Click="CloseAndSaveButton_Click">
         </Button>
-        
-        <!-- TCP Status Group -->
-        <GroupBox Margin="10,70,10,130">
-            <GroupBox.Header>
-                <Label Content="TCP Status"/>
-            </GroupBox.Header>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                
-                <!-- TCP Status TextBox -->
-                <TextBox Name="tcpStatusTextBox"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto">
-                </TextBox>
-            </Grid>
-        </GroupBox>
     </Grid>
 </Window>
