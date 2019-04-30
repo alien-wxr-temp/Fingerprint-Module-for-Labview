@@ -21,8 +21,12 @@ namespace xrFPServer
         public Data mydata;
         private Enrollment enroller;
         private Verification verify;
-        private const Int32 portNum = 13000;
-        private IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+
+        // Set the TcpListener on port 13000.
+        Int32 port = 13000;
+        IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+        // TcpListener server
+        private TcpListener server;
 
         public MainWindow()
         {
@@ -33,27 +37,24 @@ namespace xrFPServer
             this.closeAndSaveButton.IsEnabled = false;
         }
 
-        //TCP Server
-        public void tcpServer()
+        // TCP Start
+        private void tcpStart()
         {
-            bool done = false;
-
-            TcpListener listener = new TcpListener(localAddr, portNum);
-            listener.Start();
+            // Start listening for client requests.
+            server.Start();
 
             // Buffer for reading data
             Byte[] bytes = new Byte[256];
             String data = null;
-
             // Enter the listening loop.
             while (true)
             {
-                MakeReport("Waiting for a connection... ");
+                tcpStatusTextBox.AppendText("Waiting for a connection... " + "\r\n");
 
                 // Perform a blocking call to accept requests.
                 // You could also user server.AcceptSocket() here.
-                TcpClient client = listener.AcceptTcpClient();
-                MakeReport("Connected!");
+                TcpClient client = server.AcceptTcpClient();
+                tcpStatusTextBox.AppendText("Connected!" + "\r\n");
 
                 data = null;
 
@@ -67,7 +68,7 @@ namespace xrFPServer
                 {
                     // Translate data bytes to a ASCII string.
                     data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    MakeReport("Received: {0}, data = "+data);
+                    tcpStatusTextBox.AppendText("Received: " + data + "\r\n");
 
                     // Process the data sent by the client.
                     data = data.ToUpper();
@@ -75,13 +76,18 @@ namespace xrFPServer
                     byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
 
                     // Send back a response.
-                    stream.Write(msg, 0, msg.Length);
-                    MakeReport("Sent: {0}, data = "+data);
+                    //stream.Write(msg, 0, msg.Length);
                 }
 
                 // Shutdown and end connection
                 client.Close();
             }
+        }
+
+        // TCP Close
+        private void tcpClose()
+        {
+            server.Stop();
         }
 
         protected void MakeReport(string message)
@@ -205,6 +211,7 @@ namespace xrFPServer
                     }
                 }
             }
+            tcpClose();
             this.Close();
         }
 
@@ -220,7 +227,8 @@ namespace xrFPServer
             this.confirmButton.IsEnabled = true;
             this.verifyButton.IsEnabled = true;
             this.closeAndSaveButton.IsEnabled = true;
-            tcpServer();
+            server = new TcpListener(localAddr, port);
+            tcpStart();
         }
     }
 }
