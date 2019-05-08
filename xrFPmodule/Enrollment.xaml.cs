@@ -21,10 +21,6 @@ namespace xrFPmodule
     /// </summary>
     public partial class Enrollment : Window, DPFP.Capture.EventHandler
     {
-        public delegate void OnTemplateEventHandler(DPFP.Template template);
-
-        public event OnTemplateEventHandler OnTemplate;
-
         public Enrollment(Data data)
         {
             InitializeComponent();
@@ -77,7 +73,6 @@ namespace xrFPmodule
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
-                            OnTemplate(Enroller.Template);
                             SetPrompt("Click Close, and then click Fingerprint Verification.");
                             Stop();
                             break;
@@ -86,7 +81,6 @@ namespace xrFPmodule
                             Enroller.Clear();
                             Stop();
                             UpdateStatus();
-                            OnTemplate(null);
                             Start();
                             break;
                     }
