@@ -19,6 +19,7 @@ namespace xrFPmodule
     public partial class Verification : Window
     {
         private Data mydata;
+        private int counter = 5;
 
         public Verification(Data data)
         {
@@ -30,6 +31,7 @@ namespace xrFPmodule
         {
             DPFP.Verification.Verification ver = new DPFP.Verification.Verification();
             DPFP.Verification.Verification.Result res = new DPFP.Verification.Verification.Result();
+            counter--;
 
             // Compare feature set with all stored templates.
             for (int i = 0; i < mydata.serialNum; i++)
@@ -39,12 +41,22 @@ namespace xrFPmodule
                 mydata.FalseAcceptRate = res.FARAchieved;
                 if (res.Verified)
                 {
+                    System.Windows.MessageBox.Show("Welcome! " + mydata.serialName[i]);
+                    counter = 0;
                     break;
                 }
             }
 
             if (!res.Verified)
+            {
+                System.Windows.MessageBox.Show("Unkown fingerprint!!!");
                 EventHandlerStatus = DPFP.Gui.EventHandlerStatus.Failure;
+            }
+
+            if (counter==0)
+            {
+                this.Close();
+            }
 
             mydata.Update();
         }
