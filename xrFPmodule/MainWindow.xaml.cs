@@ -24,7 +24,6 @@ namespace xrFPmodule
 
     public partial class MainWindow : Window
     {
-        private new DPFP.Template Template;
         public Data mydata;
         private Enrollment enroller;
         private Verification verify;
@@ -113,20 +112,7 @@ namespace xrFPmodule
         {
             // Enrollment Window
             enroller = new Enrollment(mydata);
-            enroller.OnTemplate += this.OnTemplate;
             enroller.ShowDialog();
-        }
-
-        private void OnTemplate(DPFP.Template template)
-        {
-            this.Dispatcher.Invoke(new Action(delegate ()
-            {
-                Template = template;
-                if (Template != null)
-                    System.Windows.MessageBox.Show("The fingerprint template is ready for fingerprint verification.", "Fingerprint Enrollment");
-                else
-                    System.Windows.MessageBox.Show("The fingerprint template is not valid. Repeat fingerprint enrollment.", "Fingerprint Enrollment");
-            }));
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
