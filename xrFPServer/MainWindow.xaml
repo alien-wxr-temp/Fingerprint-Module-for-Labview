@@ -37,8 +37,12 @@
         </TextBox>
 
         <!-- Save Button -->
-        <Button Content="Confirm" Name="confirmButton" Grid.Column="0"  VerticalAlignment="Top"
-                Margin="10,40,10,0" Height="24"
+        <Button Content="Confirm"
+                Name="confirmButton"
+                VerticalAlignment="Top"
+                Margin="10,40,10,0"
+                Height="24"
+                IsEnabled="False"
                 Click="ConfirmButton_Click">
         </Button>
 
@@ -51,9 +55,29 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
+                
+                <!-- TCP Start Button -->
+                <Button Name="tcpStartButton"
+                        Content="TCP Start"
+                        VerticalAlignment="Top"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="TcpStartButton_Click">
+                </Button>
+
+                <!-- TCP Close Button -->
+                <Button Name="tcpCloseButton"
+                        Content="TCP Close"
+                        Margin="0,28,0,0"
+                        VerticalAlignment="Top"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="TcpCloseButton_Click">
+                </Button>
 
                 <!-- TCP Status TextBox -->
                 <TextBox Name="tcpStatusTextBox"
+                         Margin="0,54,0,0"
                          TextWrapping="Wrap"
                          VerticalScrollBarVisibility="Auto">
                 </TextBox>
@@ -67,20 +91,32 @@
         </Button>
 
         <!-- Enrollment Button -->
-        <Button Grid.Column="0" Content="Enrollment" Name="enrollButton" 
-                Margin="10,10,10,70" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
+        <Button Content="Enrollment"
+                Name="enrollButton"
+                Margin="10,10,10,70"
+                VerticalAlignment="Bottom"
+                Height="24"
+                IsEnabled="False"
                 Click="EnrollButton_Click">
         </Button>
 
         <!-- Verification Button -->
-        <Button Grid.Column="0" Content="Verification" Name="verifyButton" 
-                Margin="10,10,10,40" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
+        <Button Content="Verification"
+                Name="verifyButton"
+                Margin="10,10,10,40"
+                VerticalAlignment="Bottom"
+                Height="24"
+                IsEnabled="False"
                 Click="VerifyButton_Click">
         </Button>
 
         <!-- Close and Save Button -->
-        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"
-                Margin="10,10,10,10" Grid.Row="1" VerticalAlignment="Bottom" Height="24"
+        <Button Content="Close and Save" 
+                Name="closeAndSaveButton"
+                Margin="10,10,10,10"
+                VerticalAlignment="Bottom"
+                Height="24"
+                IsEnabled="False"
                 Click="CloseAndSaveButton_Click">
         </Button>
     </Grid>
