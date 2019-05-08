@@ -4,6 +4,7 @@ using System.IO;
 using System.Net.Sockets;
 using System.Text;
 using System.Net;
+using System.Threading;
 
 namespace xrFPServer
 {
@@ -17,86 +18,117 @@ namespace xrFPServer
 
     public partial class MainWindow : Window
     {
-        private new DPFP.Template Template;
         public Data mydata;
         private Enrollment enroller;
         private Verification verify;
+        // Tcp thread
+        public Thread t1;
+        public TcpListener listener = null;
+        public TcpClient client;
+        public NetworkStream stream;
 
-        // Set the TcpListener on port 13000.
-        Int32 port = 13000;
-        IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-        // TcpListener server
-        private TcpListener server;
+        public void TcpThread()
+        {
+            try
+            {
+                // Set the TcpListener on port 13000
+                Int32 port = 13000;
+                // Set the server IP address
+                IPAddress myServerIP = IPAddress.Parse("10.144.140.27");
+                // Set the TcpListener with the port and IP above.
+                listener = new TcpListener(myServerIP, port);
+                // Start listening for client requests
+                listener.Start();
+
+                // Buffer for reading data
+                Byte[] bytes = new Byte[256];
+                String data = null;
+
+                // Enter the listening loop.
+                while (true)
+                {
+                    // Start to listen for connections from a client.
+                    this.Dispatcher.Invoke(new Action(delegate
+                    {
+                        tcpStatusTextBox.AppendText("Waiting for a connection...\r\n");
+                    }));
+
+                    // Perform a blocking call to accept requests.
+                    // You could also user server.AcceptSocket() here.
+                    client = listener.AcceptTcpClient();
+
+                    // Process the connection here. (Add the client to a
+                    // server table, read data, etc.)
+                    this.Dispatcher.Invoke(new Action(delegate
+                    {
+                        tcpStatusTextBox.AppendText("Client connected!\r\n");
+                    }));
+
+                    data = null;
+
+                    // Get a stream object for reading and writing
+                    stream = client.GetStream();
+
+                    int i;
+
+                    // Loop to receive all the data sent by the client.
+                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    {
+                        // Translate data bytes to a ASCII string.
+                        data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
+
+                        switch (data[0])
+                        {
+                            // Start Enrollment Function
+                            case '1':
+                                this.Dispatcher.Invoke(new Action(delegate
+                                {
+                                    nameTextBox.Text = data.Remove(0, 1);
+                                    tcpStatusTextBox.AppendText("User: " + data.Remove(0, 1) + "\r\n");
+                                    ConfirmButton_Click(null, null);
+                                    EnrollButton_Click(null, null);
+                                    tcpStatusTextBox.AppendText("User" + nameTextBox.Text + " disconnected!\r\n");
+                                }));
+                                break;
+                            // Start Verification Function
+                            case '2':
+                                this.Dispatcher.Invoke(new Action(delegate
+                                {
+                                    nameTextBox.Text = data.Remove(0, 1);
+                                    VerifyButton_Click(null, null);
+                                }));
+                                break;
+                            // Wrong Flag
+                            default:
+                                this.Dispatcher.Invoke(new Action(delegate
+                                {
+                                    tcpStatusTextBox.AppendText("Fail! " + data[0] + "\r\n");
+                                }));
+                                break;
+                        }
+                    }
+
+                    // Shutdown and end connection
+                    client.Close();
+                }
+            }
+            catch (SocketException e)
+            {
+                this.Dispatcher.Invoke(new Action(delegate
+                {
+                    tcpStatusTextBox.AppendText("SocketException: " + e + "\r\n");
+                }));
+            }
+            finally
+            {
+                // Stop listening for new clients.
+                listener.Stop();
+            }
+        }
 
         public MainWindow()
         {
             InitializeComponent();
-            this.confirmButton.IsEnabled = false;
-            this.enrollButton.IsEnabled = false;
-            this.verifyButton.IsEnabled = false;
-            this.closeAndSaveButton.IsEnabled = false;
-        }
-
-        // TCP Start
-        private void tcpStart()
-        {
-            // Start listening for client requests.
-            server.Start();
-
-            // Buffer for reading data
-            Byte[] bytes = new Byte[256];
-            String data = null;
-            // Enter the listening loop.
-            while (true)
-            {
-                tcpStatusTextBox.AppendText("Waiting for a connection... " + "\r\n");
-
-                // Perform a blocking call to accept requests.
-                // You could also user server.AcceptSocket() here.
-                TcpClient client = server.AcceptTcpClient();
-                tcpStatusTextBox.AppendText("Connected!" + "\r\n");
-
-                data = null;
-
-                // Get a stream object for reading and writing
-                NetworkStream stream = client.GetStream();
-
-                int i;
-
-                // Loop to receive all the data sent by the client.
-                while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-                {
-                    // Translate data bytes to a ASCII string.
-                    data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
-                    tcpStatusTextBox.AppendText("Received: " + data + "\r\n");
-
-                    // Process the data sent by the client.
-                    data = data.ToUpper();
-
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes(data);
-
-                    // Send back a response.
-                    //stream.Write(msg, 0, msg.Length);
-                }
-
-                // Shutdown and end connection
-                client.Close();
-            }
-        }
-
-        // TCP Close
-        private void tcpClose()
-        {
-            server.Stop();
-        }
-
-        protected void MakeReport(string message)
-        {
-            this.Dispatcher.Invoke(new Action(delegate
-            {
-                tcpStatusTextBox.AppendText(message + "\r\n");
-                tcpStatusTextBox.ScrollToEnd();
-            }));
         }
 
         public void dataInit()
@@ -173,21 +205,8 @@ namespace xrFPServer
         private void EnrollButton_Click(object sender, RoutedEventArgs e)
         {
             // Enrollment Window
-            enroller = new Enrollment(mydata);
-            enroller.OnTemplate += this.OnTemplate;
-            enroller.ShowDialog();
-        }
-
-        private void OnTemplate(DPFP.Template template)
-        {
-            this.Dispatcher.Invoke(new Action(delegate ()
-            {
-                Template = template;
-                if (Template != null)
-                    System.Windows.MessageBox.Show("The fingerprint template is ready for fingerprint verification.", "Fingerprint Enrollment");
-                else
-                    System.Windows.MessageBox.Show("The fingerprint template is not valid. Repeat fingerprint enrollment.", "Fingerprint Enrollment");
-            }));
+            enroller = new Enrollment(mydata, stream);
+            enroller.Show();
         }
 
         private void ConfirmButton_Click(object sender, RoutedEventArgs e)
@@ -211,24 +230,40 @@ namespace xrFPServer
                     }
                 }
             }
-            tcpClose();
             this.Close();
         }
 
         private void VerifyButton_Click(object sender, RoutedEventArgs e)
         {
-            verify = new Verification(mydata);
+            verify = new Verification(mydata, stream);
             verify.ShowDialog();
         }
 
         private void InitButton_Click(object sender, RoutedEventArgs e)
         {
-            //dataInit();
+            dataInit();
             this.confirmButton.IsEnabled = true;
             this.verifyButton.IsEnabled = true;
             this.closeAndSaveButton.IsEnabled = true;
-            server = new TcpListener(localAddr, port);
-            tcpStart();
+            this.tcpStartButton.IsEnabled = true;
+            TcpStartButton_Click(null, null);
+        }
+
+        private void TcpStartButton_Click(object sender, RoutedEventArgs e)
+        {
+            // create a new thread for tcp
+            t1 = new Thread(new ThreadStart(TcpThread));
+            // start the tcpThread
+            t1.Start();
+            tcpStartButton.IsEnabled = false;
+            tcpCloseButton.IsEnabled = true;
+        }
+
+        private void TcpCloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            t1.Abort();
+            //tcpStartButton.IsEnabled = true;
+            tcpCloseButton.IsEnabled = false;
         }
     }
 }
