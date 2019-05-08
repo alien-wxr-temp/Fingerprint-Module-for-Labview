@@ -2,22 +2,26 @@
 using System.Windows;
 using System.Drawing;
 using System.IO;
+using System.Net;
+using System.Net.Sockets;
+using System.Threading;
 
 namespace xrFPServer
 {
     /// <summary>
     /// Interaction logic for Enrollment.xaml
     /// </summary>
+    /// 
+
     public partial class Enrollment : Window, DPFP.Capture.EventHandler
     {
-        public delegate void OnTemplateEventHandler(DPFP.Template template);
+        public Thread t2;
 
-        public event OnTemplateEventHandler OnTemplate;
-
-        public Enrollment(Data data)
+        public Enrollment(Data data, NetworkStream Stream)
         {
             InitializeComponent();
             mydata = data;
+            stream = Stream;
         }
 
         protected void Init()
@@ -26,14 +30,22 @@ namespace xrFPServer
             this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
 
+            //t2 = new Thread(new ThreadStart(capture));
+            //t2.Start();
+
             try
             {
-                Capturer = new DPFP.Capture.Capture();				// Create a capture operation.
+                Capturer = new DPFP.Capture.Capture();              // Create a capture operation.
 
                 if (null != Capturer)
-                    Capturer.EventHandler = this;					// Subscribe for capturing events.
+                    Capturer.EventHandler = this;                   // Subscribe for capturing events.
                 else
+                {
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("12");
+                    stream.Write(msg, 0, msg.Length);
                     SetPrompt("Can't initiate capture operation!");
+                }
+
             }
             catch
             {
@@ -42,6 +54,34 @@ namespace xrFPServer
 
             Enroller = new DPFP.Processing.Enrollment();            // Create an enrollment.
             UpdateStatus();
+        }
+
+        protected void capture()
+        {
+            this.Dispatcher.Invoke(new Action(delegate
+            {
+                try
+                {
+                    Capturer = new DPFP.Capture.Capture();              // Create a capture operation.
+
+                    if (null != Capturer)
+                        Capturer.EventHandler = this;                   // Subscribe for capturing events.
+                    else
+                    {
+                        byte[] msg = System.Text.Encoding.ASCII.GetBytes("12");
+                        stream.Write(msg, 0, msg.Length);
+                        SetPrompt("Can't initiate capture operation!");
+                    }
+
+                }
+                catch
+                {
+                    System.Windows.MessageBox.Show("Can't initiate capture operation!", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+
+                Enroller = new DPFP.Processing.Enrollment();            // Create an enrollment.
+                UpdateStatus();
+            }));
         }
 
         protected void Process(DPFP.Sample Sample)
@@ -55,6 +95,8 @@ namespace xrFPServer
             // Check quality of the sample and add to enroller if it's good
             if (features != null) try
                 {
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("21");
+                    stream.Write(msg, 0, msg.Length);
                     MakeReport("The fingerprint feature set was created.");
                     Enroller.AddFeatures(features);     // Add feature set to template.
                 }
@@ -66,7 +108,6 @@ namespace xrFPServer
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
-                            OnTemplate(Enroller.Template);
                             SetPrompt("Click Close, and then click Fingerprint Verification.");
                             Stop();
                             break;
@@ -75,7 +116,6 @@ namespace xrFPServer
                             Enroller.Clear();
                             Stop();
                             UpdateStatus();
-                            OnTemplate(null);
                             Start();
                             break;
                     }
@@ -169,6 +209,8 @@ namespace xrFPServer
 
         public void OnComplete(object Capture, string ReaderSerialNumber, DPFP.Sample Sample)
         {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("22");
+            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint sample was captured.");
             SetPrompt("Scan the same fingerprint again.");
             Process(Sample);
@@ -176,21 +218,29 @@ namespace xrFPServer
 
         public void OnFingerGone(object Capture, string ReaderSerialNumber)
         {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("23");
+            stream.Write(msg, 0, msg.Length);
             MakeReport("The finger was removed from the fingerprint reader.");
         }
 
         public void OnFingerTouch(object Capture, string ReaderSerialNumber)
         {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("24");
+            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was touched.");
         }
 
         public void OnReaderConnect(object Capture, string ReaderSerialNumber)
         {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("25");
+            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was connected.");
         }
 
         public void OnReaderDisconnect(object Capture, string ReaderSerialNumber)
         {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("26");
+            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was disconnected.");
         }
 
@@ -237,7 +287,12 @@ namespace xrFPServer
             {
                 promptTextBox.Text = prompt;
                 if (prompt == "Click Close, and then click Fingerprint Verification.")
+                {
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("11");
+                    stream.Write(msg, 0, msg.Length);
                     this.closeAndSaveButton.IsEnabled = true;
+                    CloseAndSaveButton_Click(null, null);
+                }
             }));
         }
         protected void MakeReport(string message)
@@ -258,6 +313,6 @@ namespace xrFPServer
         private DPFP.Processing.Enrollment Enroller;
         private DPFP.Capture.Capture Capturer;
         private Data mydata;
-
+        private NetworkStream stream;
     }
 }
