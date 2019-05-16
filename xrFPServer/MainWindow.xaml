@@ -1,19 +1,28 @@
 ﻿<Window x:Class="xrFPServer.MainWindow"
+        x:Name="xrFPServer"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xrFPServer"
         mc:Ignorable="d"
-        Title="xrFPServer" Height="500" Width="400">
+        Title="xrFPServer"
+        Height="180"
+        Width="300"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Visibility="Hidden">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         
         <!-- Name TextBox -->
-        <TextBox Grid.Column="0" VerticalAlignment="Top" Margin="10,10,10,0" 
-                 TextWrapping="Wrap" Name="nameTextBox" Height="24">
+        <TextBox VerticalAlignment="Top"
+                 Margin="10,10,10,0"
+                 TextWrapping="Wrap"
+                 Name="nameTextBox"
+                 Height="25">
             <TextBox.Resources>
                 <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
                     <VisualBrush.Visual>
@@ -36,88 +45,31 @@
             </TextBox.Style>
         </TextBox>
 
-        <!-- Save Button -->
-        <Button Content="Confirm"
-                Name="confirmButton"
-                VerticalAlignment="Top"
-                Margin="10,40,10,0"
-                Height="24"
-                IsEnabled="False"
-                Click="ConfirmButton_Click">
-        </Button>
-
-        <!-- TCP Status Group -->
-        <GroupBox Margin="10,70,10,130">
-            <GroupBox.Header>
-                <Label Content="TCP Status"/>
-            </GroupBox.Header>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition/>
-                </Grid.ColumnDefinitions>
-                
-                <!-- TCP Start Button -->
-                <Button Name="tcpStartButton"
-                        Content="TCP Start"
-                        VerticalAlignment="Top"
-                        Height="24"
-                        IsEnabled="False"
-                        Click="TcpStartButton_Click">
-                </Button>
-
-                <!-- TCP Close Button -->
-                <Button Name="tcpCloseButton"
-                        Content="TCP Close"
-                        Margin="0,28,0,0"
-                        VerticalAlignment="Top"
-                        Height="24"
-                        IsEnabled="False"
-                        Click="TcpCloseButton_Click">
-                </Button>
-
-                <!-- TCP Status TextBox -->
-                <TextBox Name="tcpStatusTextBox"
-                         Margin="0,54,0,0"
-                         TextWrapping="Wrap"
-                         VerticalScrollBarVisibility="Auto">
-                </TextBox>
-            </Grid>
-        </GroupBox>
-
-        <!-- Initialize Button -->
-        <Button Grid.Column="0" Content="Initialize" Name="initButton" 
-                Margin="10,10,10,100" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
-                Click="InitButton_Click">
-        </Button>
-
         <!-- Enrollment Button -->
         <Button Content="Enrollment"
                 Name="enrollButton"
-                Margin="10,10,10,70"
-                VerticalAlignment="Bottom"
-                Height="24"
-                IsEnabled="False"
+                Margin="10,40,10,0"
+                VerticalAlignment="Top"
+                Height="25"
                 Click="EnrollButton_Click">
         </Button>
 
         <!-- Verification Button -->
         <Button Content="Verification"
                 Name="verifyButton"
-                Margin="10,10,10,40"
-                VerticalAlignment="Bottom"
-                Height="24"
-                IsEnabled="False"
+                Margin="10,70,10,0"
+                VerticalAlignment="Top"
+                Height="25"
                 Click="VerifyButton_Click">
         </Button>
 
-        <!-- Close and Save Button -->
-        <Button Content="Close and Save" 
-                Name="closeAndSaveButton"
-                Margin="10,10,10,10"
-                VerticalAlignment="Bottom"
-                Height="24"
-                IsEnabled="False"
-                Click="CloseAndSaveButton_Click">
+        <!-- Close Button -->
+        <Button Content="Close" 
+                Name="closeButton"
+                Margin="10,100,10,10"
+                VerticalAlignment="Top"
+                Height="25"
+                Click="CloseButton_Click">
         </Button>
     </Grid>
 </Window>

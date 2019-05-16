@@ -4,7 +4,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
+using System.Windows.Interop;
 
 namespace xrFPServer
 {
@@ -14,12 +14,11 @@ namespace xrFPServer
     /// 
 
     public partial class Enrollment : Window, DPFP.Capture.EventHandler
-    {
-        public Thread t2;
-
+    { 
         public Enrollment(Data data, NetworkStream Stream)
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             mydata = data;
             stream = Stream;
         }
@@ -30,9 +29,6 @@ namespace xrFPServer
             this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
 
-            //t2 = new Thread(new ThreadStart(capture));
-            //t2.Start();
-
             try
             {
                 Capturer = new DPFP.Capture.Capture();              // Create a capture operation.
@@ -41,8 +37,6 @@ namespace xrFPServer
                     Capturer.EventHandler = this;                   // Subscribe for capturing events.
                 else
                 {
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("12");
-                    stream.Write(msg, 0, msg.Length);
                     SetPrompt("Can't initiate capture operation!");
                 }
 
@@ -68,8 +62,6 @@ namespace xrFPServer
                         Capturer.EventHandler = this;                   // Subscribe for capturing events.
                     else
                     {
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes("12");
-                        stream.Write(msg, 0, msg.Length);
                         SetPrompt("Can't initiate capture operation!");
                     }
 
@@ -86,17 +78,13 @@ namespace xrFPServer
 
         protected void Process(DPFP.Sample Sample)
         {
-            // Draw fingerprint sample image.
-            ConvertSampleToBitmap(Sample);
-
             // Process the sample and create a feature set for the enrollment purpose.
             DPFP.FeatureSet features = ExtractFeatures(Sample, DPFP.Processing.DataPurpose.Enrollment);
 
             // Check quality of the sample and add to enroller if it's good
-            if (features != null) try
+            if (features != null)
+                try
                 {
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("21");
-                    stream.Write(msg, 0, msg.Length);
                     MakeReport("The fingerprint feature set was created.");
                     Enroller.AddFeatures(features);     // Add feature set to template.
                 }
@@ -108,6 +96,7 @@ namespace xrFPServer
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
+
                             SetPrompt("Click Close, and then click Fingerprint Verification.");
                             Stop();
                             break;
@@ -158,6 +147,9 @@ namespace xrFPServer
         private void EnrollmentWindow_Closed(object sender, EventArgs e)
         {
             Stop();
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("1");
+            stream.Write(msg, 0, msg.Length);
+            this.Close();
         }
 
         private void EnrollmentWindow_Loaded(object sender, RoutedEventArgs e)
@@ -190,6 +182,11 @@ namespace xrFPServer
             {
                 Enroller.Template.Serialize(fs);
             }
+
+            mydata.Templates[mydata.serialNum++] = Enroller.Template;
+            mydata.serialName.Add(mydata.tempName);
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("1");
+            stream.Write(msg, 0, msg.Length);
             this.Close();
         }
 
@@ -209,8 +206,6 @@ namespace xrFPServer
 
         public void OnComplete(object Capture, string ReaderSerialNumber, DPFP.Sample Sample)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("22");
-            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint sample was captured.");
             SetPrompt("Scan the same fingerprint again.");
             Process(Sample);
@@ -218,29 +213,21 @@ namespace xrFPServer
 
         public void OnFingerGone(object Capture, string ReaderSerialNumber)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("23");
-            stream.Write(msg, 0, msg.Length);
             MakeReport("The finger was removed from the fingerprint reader.");
         }
 
         public void OnFingerTouch(object Capture, string ReaderSerialNumber)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("24");
-            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was touched.");
         }
 
         public void OnReaderConnect(object Capture, string ReaderSerialNumber)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("25");
-            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was connected.");
         }
 
         public void OnReaderDisconnect(object Capture, string ReaderSerialNumber)
         {
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("26");
-            stream.Write(msg, 0, msg.Length);
             MakeReport("The fingerprint reader was disconnected.");
         }
 
@@ -252,14 +239,6 @@ namespace xrFPServer
                 MakeReport("The quality of the fingerprint sample is poor.");
         }
         #endregion
-
-        protected Bitmap ConvertSampleToBitmap(DPFP.Sample Sample)
-        {
-            DPFP.Capture.SampleConversion Convertor = new DPFP.Capture.SampleConversion();  // Create a sample convertor.
-            Bitmap bitmap = null;                                                           // TODO: the size doesn't matter
-            Convertor.ConvertToPicture(Sample, ref bitmap);                                 // TODO: return bitmap as a result
-            return bitmap;
-        }
 
         protected DPFP.FeatureSet ExtractFeatures(DPFP.Sample Sample, DPFP.Processing.DataPurpose Purpose)
         {
@@ -288,8 +267,6 @@ namespace xrFPServer
                 promptTextBox.Text = prompt;
                 if (prompt == "Click Close, and then click Fingerprint Verification.")
                 {
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("11");
-                    stream.Write(msg, 0, msg.Length);
                     this.closeAndSaveButton.IsEnabled = true;
                     CloseAndSaveButton_Click(null, null);
                 }

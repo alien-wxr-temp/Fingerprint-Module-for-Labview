@@ -3,67 +3,190 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:wf="clr-namespace:DPFP.Gui.Verification;assembly=DPFPGuiNET"
         xmlns:local="clr-namespace:xrFPmodule"
         mc:Ignorable="d"
-        Title="xrFPmodule" Height="500" Width="400">
+        Title="xrFPmodule" Height="500" Width="1200">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
         </Grid.ColumnDefinitions>
         
-        <!-- Name TextBox -->
-        <TextBox Grid.Column="0" VerticalAlignment="Top" Margin="10,10,10,0" 
-                 TextWrapping="Wrap" Name="nameTextBox" Height="24">
-            <TextBox.Resources>
-                <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
-                    <VisualBrush.Visual>
-                        <TextBox FontStyle="Italic" Text="Please input your name:" 
+        <!-- MainWindow GroupBox -->
+        <GroupBox Grid.Column="0"
+                  Margin="5,0,5,5">
+            <GroupBox.Header>
+                <Label Content="MainWindow"/>
+            </GroupBox.Header>
+            <Grid>
+                <!-- Name TextBox -->
+                <TextBox VerticalAlignment="Top" 
+                         Margin="0,0,0,0"
+                         TextWrapping="Wrap"
+                         Name="nameTextBox"
+                         Height="24">
+                    <TextBox.Resources>
+                        <VisualBrush x:Key="HintText" TileMode="None" Opacity="0.5" Stretch="None" AlignmentX="Left">
+                            <VisualBrush.Visual>
+                                <TextBox FontStyle="Italic" Text="Please input your name:" 
                                  Background="Transparent" BorderBrush="Transparent"/>
-                    </VisualBrush.Visual>
-                </VisualBrush>
-            </TextBox.Resources>
-            <TextBox.Style>
-                <Style TargetType="TextBox">
-                    <Style.Triggers>
-                        <Trigger Property="Text" Value="{x:Null}">
-                            <Setter Property="Background" Value="{StaticResource HintText}"/>
-                        </Trigger>
-                        <Trigger Property="Text" Value="">
-                            <Setter Property="Background" Value="{StaticResource HintText}"/>
-                        </Trigger>
-                    </Style.Triggers>
-                </Style>
-            </TextBox.Style>
-        </TextBox>
+                            </VisualBrush.Visual>
+                        </VisualBrush>
+                    </TextBox.Resources>
+                    <TextBox.Style>
+                        <Style TargetType="TextBox">
+                            <Style.Triggers>
+                                <Trigger Property="Text" Value="{x:Null}">
+                                    <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                </Trigger>
+                                <Trigger Property="Text" Value="">
+                                    <Setter Property="Background" Value="{StaticResource HintText}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBox.Style>
+                </TextBox>
 
-        <!-- Save Button -->
-        <Button Content="Confirm" Name="confirmButton" Grid.Column="0"  VerticalAlignment="Top"
-                Margin="10,40,10,0" Height="24"
-                Click="ConfirmButton_Click">
-        </Button>
+                <!-- Confirm Button -->
+                <Button Content="Confirm"
+                        Name="confirmButton"
+                        VerticalAlignment="Top"
+                        Margin="0,30,0,0"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="ConfirmButton_Click">
+                </Button>
 
-        <!-- Initialize Button -->
-        <Button Grid.Column="0" Content="Initialize" Name="initButton" 
-                Margin="10,10,10,100" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
-                Click="InitButton_Click">
-        </Button>
+                <!-- Initialize Button -->
+                <Button Content="Initialize"
+                        Name="initButton"
+                        Margin="0,0,0,90"
+                        VerticalAlignment="Bottom"
+                        Height="24"
+                        Click="InitButton_Click">
+                </Button>
 
-        <!-- Enrollment Button -->
-        <Button Grid.Column="0" Content="Enrollment" Name="enrollButton" 
-                Margin="10,10,10,70" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
-                Click="EnrollButton_Click">
-        </Button>
+                <!-- Enrollment Button -->
+                <Button Content="Enrollment"
+                        Name="enrollButton"
+                        Margin="0,0,0,60"
+                        VerticalAlignment="Bottom"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="EnrollButton_Click">
+                </Button>
 
-        <!-- Verification Button -->
-        <Button Grid.Column="0" Content="Verification" Name="verifyButton" 
-                Margin="10,10,10,40" Grid.Row="1" VerticalAlignment="Bottom" Height="24" 
-                Click="VerifyButton_Click">
-        </Button>
+                <!-- Verification Button -->
+                <Button Content="Verification"
+                        Name="verifyButton"
+                        Margin="0,0,0,30"
+                        VerticalAlignment="Bottom"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="VerifyButton_Click">
+                </Button>
 
-        <!-- Close and Save Button -->
-        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"
-                Margin="10,10,10,10" Grid.Row="1" VerticalAlignment="Bottom" Height="24"
-                Click="CloseAndSaveButton_Click">
-        </Button>
+                <!-- Close and Save Button -->
+                <Button Content="Quit and Save"
+                        Name="quitAndSaveButton"
+                        Margin="0,0,0,0"
+                        VerticalAlignment="Bottom"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="QuitAndSaveButton_Click">
+                </Button>
+            </Grid>
+        </GroupBox>
+        
+        <!-- Enrollment GroupBox -->
+        <GroupBox Grid.Column="1"
+                  Margin="5,0,5,5">
+            <GroupBox.Header>
+                <Label Content="Enrollment"/>
+            </GroupBox.Header>
+            <Grid>
+                <!-- Prompt GroupBox -->
+                <GroupBox Margin="0,-10,0,0"
+                          VerticalAlignment="Top"
+                          Height="60">
+                    <GroupBox.Header>
+                        <Label Content="Prompt"/>
+                    </GroupBox.Header>
+                    <TextBox VerticalAlignment="Top"
+                             Height="24"
+                             TextWrapping="Wrap"
+                             Name="promptTextBox"
+                             Text="prompt init"
+                             IsReadOnly="True">
+                    </TextBox>
+                </GroupBox>
+
+                <!-- Status Groupbox -->
+                <GroupBox Margin="0,40,0,35">
+                    <GroupBox.Header>
+                        <Label Content="Status"/>
+                    </GroupBox.Header>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition/>
+                        </Grid.ColumnDefinitions>
+                        <TextBox Margin="0,0,0,15"
+                                 Name="statusTextBox"
+                                 TextWrapping="Wrap"
+                                 VerticalScrollBarVisibility="Auto"
+                                 IsReadOnly="True">
+                        </TextBox>
+                        <Label Name="statusLabel"
+                               Content="Ready"
+                               Margin="0,0,0,-6"
+                               Height="26"
+                               VerticalAlignment="Bottom">
+                        </Label>
+                    </Grid>
+                </GroupBox>
+
+                <!-- Save Button -->
+                <Button Content="Save"
+                        Name="SaveButton"
+                        VerticalAlignment="Bottom"
+                        Margin="0,40,0,5"
+                        Height="24"
+                        IsEnabled="False"
+                        Click="SaveButton_Click">
+                </Button>
+            </Grid>
+        </GroupBox>
+        
+        <!-- Verification GroupBox -->
+        <GroupBox Grid.Column="2"
+                  Margin="5,0,5,5"
+                  VerticalAlignment="Top"
+                  Height="140">
+            <GroupBox.Header>
+                <Label Content="Verification"/>
+            </GroupBox.Header>
+            <Grid>
+                <!-- VerificationControl -->
+                <WindowsFormsHost Margin="10,10,10,60" Background="{x:Null}" Foreground="{x:Null}" HorizontalAlignment="Center">
+                    <wf:VerificationControl x:Name="verifyControl"
+                                    Active="True"
+                                    AutoSizeMode="GrowAndShrink"
+                                    OnComplete="VerifyControl_OnComplete"
+                                    BackColor="Transparent" ForeColor="Transparent"/>
+                </WindowsFormsHost>
+
+                <!-- Prompt Label -->
+                <Label x:Name="promptLabel"
+                       Margin="0,30,0,0"
+                       VerticalAlignment="Bottom">
+                    <TextBlock TextWrapping="Wrap"
+                               Text="To verify your identity, touch fingerprint reader with any enrolled finger.">
+                    </TextBlock>
+                </Label>
+            </Grid>
+        </GroupBox>
+        
     </Grid>
 </Window>

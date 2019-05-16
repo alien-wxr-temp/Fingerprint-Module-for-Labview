@@ -5,8 +5,15 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:xrFPServer"
         mc:Ignorable="d"
-        Title="Enrollment" Height="500" Width="400"
-        x:Name="EnrollmentWindow" Closed="EnrollmentWindow_Closed" Loaded="EnrollmentWindow_Loaded">
+        Title="EnrollmentWindow"
+        Height="500"
+        Width="400"
+        WindowStartupLocation="CenterOwner"
+        ResizeMode="NoResize"
+        x:Name="EnrollmentWindow"
+        ShowInTaskbar="False"
+        Closed="EnrollmentWindow_Closed"
+        Loaded="EnrollmentWindow_Loaded">
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition/>

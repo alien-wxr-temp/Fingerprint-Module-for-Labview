@@ -5,7 +5,12 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:wf="clr-namespace:DPFP.Gui.Verification;assembly=DPFPGuiNET"
         mc:Ignorable="d"
-        Title="Verification" Height="160" Width="300" ResizeMode="NoResize">
+        Title="Verification"
+        Height="160"
+        Width="300"
+        ShowInTaskbar="False"
+        ResizeMode="NoResize"
+        Closed="Window_Closed">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition/>

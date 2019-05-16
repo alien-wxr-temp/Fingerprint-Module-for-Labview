@@ -5,6 +5,8 @@ using System.Net.Sockets;
 using System.Text;
 using System.Net;
 using System.Threading;
+using System.Runtime.InteropServices;
+using System.Windows.Interop;
 
 namespace xrFPServer
 {
@@ -18,15 +20,45 @@ namespace xrFPServer
 
     public partial class MainWindow : Window
     {
-        public Data mydata;
-        private Enrollment enroller;
-        private Verification verify;
-        // Tcp thread
-        public Thread t1;
-        public TcpListener listener = null;
-        public TcpClient client;
-        public NetworkStream stream;
+        #region <Windows API>
+        // activate a window and set it focused
+        [DllImport("user32.dll", EntryPoint = "SetForegroundWindow")]
+        public static extern bool SetForegroundWindow(IntPtr hWnd);
+        #endregion </Windows API>
 
+        public MainWindow()
+        {
+            InitializeComponent();
+            Init();
+        }
+
+        #region <Member>
+        // data
+        private Data mydata;
+        // tcp thread
+        private Thread tcpThread;
+        // tcp member
+        private TcpListener listener = null;
+        private TcpClient client;
+        private NetworkStream stream;
+        // enrollment member
+        private Enrollment enroller;
+        // verification member
+        private Verification verify;
+        #endregion </Member>
+
+        #region <TCP>
+        private void TcpStart()
+        {
+            // create a new thread for tcp
+            tcpThread = new Thread(new ThreadStart(TcpThread));
+            // start the tcpThread
+            tcpThread.Start();
+        }
+        private void TcpClose()
+        {
+            tcpThread.Abort();
+        }
         public void TcpThread()
         {
             try
@@ -34,7 +66,7 @@ namespace xrFPServer
                 // Set the TcpListener on port 13000
                 Int32 port = 13000;
                 // Set the server IP address
-                IPAddress myServerIP = IPAddress.Parse("10.144.140.27");
+                IPAddress myServerIP = IPAddress.Parse("127.0.0.1");
                 // Set the TcpListener with the port and IP above.
                 listener = new TcpListener(myServerIP, port);
                 // Start listening for client requests
@@ -47,23 +79,12 @@ namespace xrFPServer
                 // Enter the listening loop.
                 while (true)
                 {
-                    // Start to listen for connections from a client.
-                    this.Dispatcher.Invoke(new Action(delegate
-                    {
-                        tcpStatusTextBox.AppendText("Waiting for a connection...\r\n");
-                    }));
-
                     // Perform a blocking call to accept requests.
                     // You could also user server.AcceptSocket() here.
                     client = listener.AcceptTcpClient();
 
                     // Process the connection here. (Add the client to a
                     // server table, read data, etc.)
-                    this.Dispatcher.Invoke(new Action(delegate
-                    {
-                        tcpStatusTextBox.AppendText("Client connected!\r\n");
-                    }));
-
                     data = null;
 
                     // Get a stream object for reading and writing
@@ -84,10 +105,7 @@ namespace xrFPServer
                                 this.Dispatcher.Invoke(new Action(delegate
                                 {
                                     nameTextBox.Text = data.Remove(0, 1);
-                                    tcpStatusTextBox.AppendText("User: " + data.Remove(0, 1) + "\r\n");
-                                    ConfirmButton_Click(null, null);
                                     EnrollButton_Click(null, null);
-                                    tcpStatusTextBox.AppendText("User" + nameTextBox.Text + " disconnected!\r\n");
                                 }));
                                 break;
                             // Start Verification Function
@@ -98,40 +116,37 @@ namespace xrFPServer
                                     VerifyButton_Click(null, null);
                                 }));
                                 break;
-                            // Wrong Flag
-                            default:
+                            case '3':
                                 this.Dispatcher.Invoke(new Action(delegate
                                 {
-                                    tcpStatusTextBox.AppendText("Fail! " + data[0] + "\r\n");
+                                    CloseButton_Click(null, null);
                                 }));
+                                break;
+                            // Wrong Flag
+                            default:
+                                System.Windows.MessageBox.Show("Fail! " + data[0] + "\r\n");
                                 break;
                         }
                     }
-
                     // Shutdown and end connection
                     client.Close();
                 }
             }
             catch (SocketException e)
             {
-                this.Dispatcher.Invoke(new Action(delegate
-                {
-                    tcpStatusTextBox.AppendText("SocketException: " + e + "\r\n");
-                }));
+                System.Windows.MessageBox.Show("SocketException: " + e + "\r\n");
             }
             finally
             {
                 // Stop listening for new clients.
                 listener.Stop();
             }
+            TcpClose();
         }
+        #endregion </TCP>
 
-        public MainWindow()
-        {
-            InitializeComponent();
-        }
-
-        public void dataInit()
+        #region <Data>
+        public void DataInit()
         {
             mydata = new Data();
             mydata.OnChange += delegate { ExchangeData(false); };	// Track data changes to keep the form synchronized
@@ -140,25 +155,21 @@ namespace xrFPServer
             mydata.logPath = mydata.folderPath + "\\dataLog.txt";
             if (!System.IO.Directory.Exists(mydata.folderPath))
                 System.IO.Directory.CreateDirectory(mydata.folderPath);
-            if (!System.IO.File.Exists(mydata.logPath))
+            if (System.IO.File.Exists(mydata.logPath))
             {
-                System.IO.File.Create(mydata.logPath);
-            }
-            else
-            {
-                mySR();
-                mySW();
+                MySR();
+                MySW();
             }
         }
 
         // Read dataLog.txt
-        private void mySR()
+        private void MySR()
         {
             using (StreamReader sr = new StreamReader(mydata.logPath))
             {
                 mydata.userNum = Convert.ToInt32(sr.ReadLine());
                 string line;
-                while ((line=sr.ReadLine())!=null)
+                while ((line = sr.ReadLine()) != null)
                 {
                     database user = new database();
                     user.username = line;
@@ -169,7 +180,7 @@ namespace xrFPServer
         }
 
         // Read .fpt files
-        private void mySW()
+        private void MySW()
         {
             for (int i = 0; i < mydata.userNum; i++)
             {
@@ -201,21 +212,41 @@ namespace xrFPServer
             {   // read valuse from the data object to the form's controls
             }
         }
+        #endregion </Data>
 
+        #region <Enrollment>
         private void EnrollButton_Click(object sender, RoutedEventArgs e)
         {
+            mydata.tempName = this.nameTextBox.Text;
             // Enrollment Window
             enroller = new Enrollment(mydata, stream);
             enroller.Show();
+            var hwnd = new WindowInteropHelper(enroller).Handle;  //获取window的句柄
+            SetForegroundWindow(hwnd);
         }
+        #endregion </Enrollment>
 
-        private void ConfirmButton_Click(object sender, RoutedEventArgs e)
+        #region <Verification>
+        private void VerifyButton_Click(object sender, RoutedEventArgs e)
         {
-            mydata.tempName = this.nameTextBox.Text;
-            this.enrollButton.IsEnabled = true;
+            // verification window
+            verify = new Verification(mydata, stream);
+            verify.Show();
+            var hwnd = new WindowInteropHelper(verify).Handle;  //获取window的句柄
+            SetForegroundWindow(hwnd);
         }
+        #endregion </Verification>
 
-        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
+        #region <Initialization>
+        public void Init()
+        {
+            DataInit();
+            TcpStart();
+        }
+        #endregion </Initialization>
+
+        #region <Close>
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
             File.Delete(mydata.logPath);
             using (FileStream fs = new FileStream(mydata.logPath, FileMode.Create))
@@ -230,40 +261,12 @@ namespace xrFPServer
                     }
                 }
             }
-            this.Close();
+            Environment.Exit(0);
         }
-
-        private void VerifyButton_Click(object sender, RoutedEventArgs e)
+        private void Window_Closed(object sender, EventArgs e)
         {
-            verify = new Verification(mydata, stream);
-            verify.ShowDialog();
+            CloseButton_Click(null, null);
         }
-
-        private void InitButton_Click(object sender, RoutedEventArgs e)
-        {
-            dataInit();
-            this.confirmButton.IsEnabled = true;
-            this.verifyButton.IsEnabled = true;
-            this.closeAndSaveButton.IsEnabled = true;
-            this.tcpStartButton.IsEnabled = true;
-            TcpStartButton_Click(null, null);
-        }
-
-        private void TcpStartButton_Click(object sender, RoutedEventArgs e)
-        {
-            // create a new thread for tcp
-            t1 = new Thread(new ThreadStart(TcpThread));
-            // start the tcpThread
-            t1.Start();
-            tcpStartButton.IsEnabled = false;
-            tcpCloseButton.IsEnabled = true;
-        }
-
-        private void TcpCloseButton_Click(object sender, RoutedEventArgs e)
-        {
-            t1.Abort();
-            //tcpStartButton.IsEnabled = true;
-            tcpCloseButton.IsEnabled = false;
-        }
+        #endregion </Close>
     }
 }

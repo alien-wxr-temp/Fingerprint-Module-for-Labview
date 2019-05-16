@@ -12,11 +12,11 @@ namespace xrFPServer
     {
         private Data mydata;
         private NetworkStream stream;
-        private int counter = 5;
 
         public Verification(Data data,NetworkStream Stream)
         {
             InitializeComponent();
+            WindowStartupLocation = WindowStartupLocation.CenterScreen;
             mydata = data;
             stream = Stream;
         }
@@ -25,7 +25,6 @@ namespace xrFPServer
         {
             DPFP.Verification.Verification ver = new DPFP.Verification.Verification();
             DPFP.Verification.Verification.Result res = new DPFP.Verification.Verification.Result();
-            counter--;
 
             // Compare feature set with all stored templates.
             for (int i = 0; i < mydata.serialNum; i++)
@@ -35,10 +34,11 @@ namespace xrFPServer
                 mydata.FalseAcceptRate = res.FARAchieved;
                 if (res.Verified)
                 {
-                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("1"+mydata.serialName[i]);
-                    stream.Write(msg, 0, msg.Length);
-                    msg = System.Text.Encoding.ASCII.GetBytes("21");
-                    stream.Write(msg, 0, msg.Length);
+                    string msg = "Welcome! " + mydata.serialName[i];
+                    System.Windows.MessageBox.Show(msg, "Welcome", MessageBoxButton.OK);
+                    msg = "1" + string.Format("{0:00}", mydata.serialName[i].Length) + mydata.serialName[i];
+                    byte[] msg2 = System.Text.Encoding.ASCII.GetBytes(msg);
+                    stream.Write(msg2, 0, msg2.Length);
                     this.Close();
                     break;
                 }
@@ -46,19 +46,21 @@ namespace xrFPServer
 
             if (!res.Verified)
             {
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes("0"+Convert.ToString(counter));
-                stream.Write(msg, 0, msg.Length);
+                string msg = "Unknown access!";
+                System.Windows.MessageBox.Show(msg, "Warning", MessageBoxButton.OK);
+                byte[] msg2 = System.Text.Encoding.ASCII.GetBytes("0");
+                stream.Write(msg2, 0, msg2.Length);
                 EventHandlerStatus = DPFP.Gui.EventHandlerStatus.Failure;
             }
 
-            if (counter == 0)
-            {
-                byte[] msg = System.Text.Encoding.ASCII.GetBytes("20");
-                stream.Write(msg, 0, msg.Length);
-                this.Close();
-            }
-
             mydata.Update();
+        }
+
+        private void Window_Closed(object sender, EventArgs e)
+        {
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("0");
+            stream.Write(msg, 0, msg.Length);
+            this.Close();
         }
     }
 }
