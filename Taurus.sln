@@ -9,6 +9,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrFPServer", "xrFPServer\xr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrFPConsole", "xrFPConsole\xrFPConsole.csproj", "{529BB79B-44DB-443B-B04E-1A5F6ECBEA0F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrFpIDmodule", "xrFpIDmodule\xrFpIDmodule.csproj", "{072B9B23-DB13-4BC7-BE26-B19DFC7781E6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "xrFpIDserver", "xrFpIDserver\xrFpIDserver.csproj", "{A1FA24EE-357C-4817-B34B-461C5AA24C06}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +31,14 @@ Global
 		{529BB79B-44DB-443B-B04E-1A5F6ECBEA0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{529BB79B-44DB-443B-B04E-1A5F6ECBEA0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{529BB79B-44DB-443B-B04E-1A5F6ECBEA0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{072B9B23-DB13-4BC7-BE26-B19DFC7781E6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{072B9B23-DB13-4BC7-BE26-B19DFC7781E6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{072B9B23-DB13-4BC7-BE26-B19DFC7781E6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{072B9B23-DB13-4BC7-BE26-B19DFC7781E6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A1FA24EE-357C-4817-B34B-461C5AA24C06}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A1FA24EE-357C-4817-B34B-461C5AA24C06}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A1FA24EE-357C-4817-B34B-461C5AA24C06}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A1FA24EE-357C-4817-B34B-461C5AA24C06}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

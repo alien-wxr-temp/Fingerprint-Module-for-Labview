@@ -1,10 +1,10 @@
-﻿<Window x:Class="xrFPServer.Verification"
+﻿<Window x:Class="xrFpIDmodule.Verification"
+        x:Name="VerificationWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:xrFPServer"
-        x:Name="VerificationWindow"
+        xmlns:local="clr-namespace:xrFpIDmodule"
         mc:Ignorable="d"
         Title="Verification"
         Height="500"
@@ -50,10 +50,9 @@
         </GroupBox>
 
         <!-- Close & Save Button -->
-        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"  VerticalAlignment="Bottom"
+        <Button Content="Close" Name="closeButton" Grid.Column="0"  VerticalAlignment="Bottom"
                 Margin="10,40,10,5" Height="24"
-                Click="CloseAndSaveButton_Click">
+                Click="CloseButton_Click">
         </Button>
-
     </Grid>
 </Window>

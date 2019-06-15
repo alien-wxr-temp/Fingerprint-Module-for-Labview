@@ -3,14 +3,20 @@ using System.Windows;
 using System.IO;
 using System.Net.Sockets;
 
-namespace xrFPServer
+namespace xrFpIDserver
 {
     /// <summary>
     /// Interaction logic for Enrollment.xaml
     /// </summary>
-    /// 
     public partial class Enrollment : Window, DPFP.Capture.EventHandler
     {
+        #region <Member>
+        private DPFP.Processing.Enrollment Enroller;
+        private DPFP.Capture.Capture Capturer;
+        private Data mydata;
+        private NetworkStream stream;
+        #endregion </Member>
+
         public Enrollment(Data data, NetworkStream Stream)
         {
             InitializeComponent();
@@ -21,8 +27,6 @@ namespace xrFPServer
 
         protected void Init()
         {
-
-            this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
 
             try
@@ -92,7 +96,7 @@ namespace xrFPServer
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
-                            SetPrompt("Click Close, and then click Fingerprint Verification.");
+                            SetPrompt("End");
                             Stop();
                             break;
 
@@ -144,7 +148,6 @@ namespace xrFPServer
             Stop();
             byte[] msg = System.Text.Encoding.ASCII.GetBytes("1");
             stream.Write(msg, 0, msg.Length);
-            this.Close();
         }
 
         private void EnrollmentWindow_Loaded(object sender, RoutedEventArgs e)
@@ -153,7 +156,7 @@ namespace xrFPServer
             Start();
         }
 
-        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
+        protected void CloseAndSave()
         {
             int userSeiral = matching();
             //save template
@@ -180,12 +183,29 @@ namespace xrFPServer
 
             mydata.Templates[mydata.serialNum++] = Enroller.Template;
             mydata.serialName.Add(mydata.tempName);
-            this.Close();
+
+            File.Delete(mydata.logPath);
+            using (FileStream fs = new FileStream(mydata.logPath, FileMode.Create))
+            {
+                using (StreamWriter sw = new StreamWriter(fs))
+                {
+                    sw.WriteLine(mydata.userNum);
+                    foreach (database user in mydata.userList)
+                    {
+                        sw.WriteLine(user.username);
+                        sw.WriteLine(user.fpNum);
+                    }
+                }
+            }
+            this.Dispatcher.Invoke(new Action(delegate
+            {
+                this.Close();
+            }));
         }
 
         private int matching()
         {
-            for (int i=0; i<mydata.userNum; i++)
+            for (int i = 0; i < mydata.userNum; i++)
             {
                 if (mydata.tempName == mydata.userList[i].username)
                     return i;
@@ -255,15 +275,26 @@ namespace xrFPServer
 
         protected void SetPrompt(string prompt)
         {
-            this.Dispatcher.Invoke(new Action(delegate
+            if (prompt == "End")
             {
-                promptTextBox.Text = prompt;
-                if (prompt == "Click Close, and then click Fingerprint Verification.")
+                this.Dispatcher.Invoke(new Action(delegate
                 {
-                    this.closeAndSaveButton.IsEnabled = true;
-                    CloseAndSaveButton_Click(null, null);
-                }
-            }));
+                    promptTextBox.Text = "Succeed";
+                }));
+                this.Dispatcher.Invoke(new Action(delegate
+                {
+                    System.Windows.MessageBox.Show(this, "Succeed", "Success",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                }));
+                CloseAndSave();
+            }
+            else
+            {
+                this.Dispatcher.Invoke(new Action(delegate
+                {
+                    promptTextBox.Text = prompt;
+                }));
+            }
         }
         protected void MakeReport(string message)
         {
@@ -279,10 +310,5 @@ namespace xrFPServer
             // Show number of samples needed.
             SetStatus(String.Format("Fingerprint samples needed: {0}", Enroller.FeaturesNeeded));
         }
-
-        private DPFP.Processing.Enrollment Enroller;
-        private DPFP.Capture.Capture Capturer;
-        private Data mydata;
-        private NetworkStream stream;
     }
 }

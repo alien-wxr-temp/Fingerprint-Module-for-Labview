@@ -1,21 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace xrFPServer
+namespace xrFpIDserver
 {
-    //
-    //Refer to "UISupportSample CS\AppData.cs"
-    //
-
     public delegate void OnChangeHandler();
-
-    // Keeps application-wide data shared among forms and provides notifications about changes
-    //
-    // Everywhere in this application a "document-view" model is used, and this class provides
-    // a "document" part, whereas forms implement a "view" parts.
-    // Each form interested in this data keeps a reference to it and synchronizes it with own 
-    // controls using the OnChange() event and the Update() notificator method.
-    //
-
     public class Data
     {
         public const int MaxTemplates = 100;

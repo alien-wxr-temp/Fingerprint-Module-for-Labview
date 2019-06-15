@@ -1,11 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace xrFPServer
+namespace xrFpIDmodule
 {
-    //
-    //Refer to "UISupportSample CS\AppData.cs"
-    //
-
     public delegate void OnChangeHandler();
 
     // Keeps application-wide data shared among forms and provides notifications about changes

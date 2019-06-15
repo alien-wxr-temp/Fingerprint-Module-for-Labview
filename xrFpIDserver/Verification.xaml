@@ -1,10 +1,10 @@
-﻿<Window x:Class="xrFPServer.Verification"
+﻿<Window x:Class="xrFpIDserver.Verification"
+        x:Name="VerifyWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:xrFPServer"
-        x:Name="VerificationWindow"
+        xmlns:local="clr-namespace:xrFpIDserver"
         mc:Ignorable="d"
         Title="Verification"
         Height="500"
@@ -31,7 +31,7 @@
         </GroupBox>
 
         <!-- Status Groupbox -->
-        <GroupBox Margin="5,55,5,35">
+        <GroupBox Margin="5,55,5,5">
             <GroupBox.Header>
                 <Label Content="Status"/>
             </GroupBox.Header>
@@ -39,21 +39,19 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                 </Grid.ColumnDefinitions>
-                <TextBox Margin="0,0,0,15" Name="statusTextBox" 
-                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
-                         Text="status init" IsReadOnly="True">
+                <TextBox Margin="0,0,0,15"
+                         Name="statusTextBox" 
+                         TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto"
+                         IsReadOnly="True">
                 </TextBox>
-                <Label Name="statusLabel" Content="Ready"
-                       Margin="0,0,0,-6" Height="26" VerticalAlignment="Bottom">
+                <Label Name="statusLabel"
+                       Content="Ready"
+                       Margin="0,0,0,-6"
+                       Height="26"
+                       VerticalAlignment="Bottom">
                 </Label>
             </Grid>
         </GroupBox>
-
-        <!-- Close & Save Button -->
-        <Button Content="Close and Save" Name="closeAndSaveButton" Grid.Column="0"  VerticalAlignment="Bottom"
-                Margin="10,40,10,5" Height="24"
-                Click="CloseAndSaveButton_Click">
-        </Button>
-
     </Grid>
 </Window>

@@ -1,17 +1,21 @@
 ﻿using System;
-using System.Windows;
 using System.Net.Sockets;
+using System.Windows;
 
-namespace xrFPServer
+namespace xrFpIDserver
 {
-    /// <summary>
+    /// <summary> 
     /// Interaction logic for Verification.xaml
     /// </summary>
     public partial class Verification : Window, DPFP.Capture.EventHandler
     {
+        #region <Member>
         private Data mydata;
         private NetworkStream stream;
         private DPFP.Verification.Verification Verificator;
+        private DPFP.Capture.Capture Capturer;
+        #endregion </Member>
+
         public Verification(Data data, NetworkStream Stream)
         {
             InitializeComponent();
@@ -40,19 +44,35 @@ namespace xrFPServer
                     mydata.FalseAcceptRate = result.FARAchieved;
                     if (result.Verified)
                     {
+                        SetPrompt("Succeed");
                         MakeReport("The fingerprint was VERIFIED.");
-                        string msg = "1" + string.Format("{0:00}", mydata.serialName[i].Length) + mydata.serialName[i];
-                        byte[] msg2 = System.Text.Encoding.ASCII.GetBytes(msg);
-                        stream.Write(msg2, 0, msg2.Length);
-                        this.Close();
+                        MakeReport("Welcome! " + mydata.serialName[i]);
+                        string str = "1" + string.Format("{0:00}", mydata.serialName[i].Length) + mydata.serialName[i];
+                        byte[] msg = System.Text.Encoding.ASCII.GetBytes(str);
+                        stream.Write(msg, 0, msg.Length);
+                        Stop();
+                        this.Dispatcher.Invoke(new Action(delegate
+                        {
+                            System.Windows.MessageBox.Show(this, "Welcome! " + mydata.serialName[i],
+                                "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                            this.Close();
+                        }));
                         break;
                     }
                 }
                 if (!result.Verified)
                 {
+                    SetPrompt("Fail");
                     MakeReport("The fingerprint was NOT VERIFIED.");
-                    byte[] msg2 = System.Text.Encoding.ASCII.GetBytes("0");
-                    stream.Write(msg2, 0, msg2.Length);
+                    byte[] msg = System.Text.Encoding.ASCII.GetBytes("2");
+                    stream.Write(msg, 0, msg.Length);
+                    Stop();
+                    this.Dispatcher.Invoke(new Action(delegate
+                    {
+                        System.Windows.MessageBox.Show(this, "Unknown access",
+                            "Failure", MessageBoxButton.OK, MessageBoxImage.Error);
+                        this.Close();
+                    }));
                 }
 
                 mydata.Update();
@@ -67,7 +87,6 @@ namespace xrFPServer
 
         protected void Init()
         {
-            this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
             Verificator = new DPFP.Verification.Verification();     // Create a fingerprint template verificator
             UpdateStatus(0);
@@ -117,11 +136,11 @@ namespace xrFPServer
             }
         }
 
-        #region Form Event Handlers:
+        #region Window Event Handlers:
         private void VerificationWindow_Closed(object sender, EventArgs e)
         {
             Stop();
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("0");
+            byte[] msg = System.Text.Encoding.ASCII.GetBytes("3");
             stream.Write(msg, 0, msg.Length);
         }
 
@@ -130,11 +149,6 @@ namespace xrFPServer
             Init();
             Start();
         }
-
-        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
-        {
-
-        }
         #endregion
 
         #region EventHandler Members:
@@ -142,7 +156,6 @@ namespace xrFPServer
         public void OnComplete(object Capture, string ReaderSerialNumber, DPFP.Sample Sample)
         {
             MakeReport("The fingerprint sample was captured.");
-            SetPrompt("Scan the same fingerprint again.");
             Process(Sample);
         }
 
@@ -198,22 +211,14 @@ namespace xrFPServer
         {
             this.Dispatcher.Invoke(new Action(delegate () {
                 promptTextBox.Text = prompt;
-                if (prompt == "Click Close, and then click Fingerprint Verification.")
-                {
-                    this.closeAndSaveButton.IsEnabled = true;
-                    CloseAndSaveButton_Click(null, null);
-                }
             }));
         }
         protected void MakeReport(string message)
         {
             this.Dispatcher.Invoke(new Action(delegate () {
                 statusTextBox.AppendText(message + "\r\n");
+                statusTextBox.ScrollToEnd();
             }));
         }
-
-        private DPFP.Capture.Capture Capturer;
-
-       
     }
 }

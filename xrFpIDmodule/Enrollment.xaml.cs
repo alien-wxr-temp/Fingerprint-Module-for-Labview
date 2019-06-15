@@ -1,22 +1,19 @@
 ﻿using System;
 using System.Windows;
 using System.IO;
-using System.Net.Sockets;
 
-namespace xrFPServer
+namespace xrFpIDmodule
 {
     /// <summary>
     /// Interaction logic for Enrollment.xaml
     /// </summary>
-    /// 
     public partial class Enrollment : Window, DPFP.Capture.EventHandler
     {
-        public Enrollment(Data data, NetworkStream Stream)
+        public Enrollment(Data data)
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             mydata = data;
-            stream = Stream;
         }
 
         protected void Init()
@@ -92,6 +89,7 @@ namespace xrFPServer
                     switch (Enroller.TemplateStatus)
                     {
                         case DPFP.Processing.Enrollment.Status.Ready:   // report success and stop capturing
+
                             SetPrompt("Click Close, and then click Fingerprint Verification.");
                             Stop();
                             break;
@@ -142,9 +140,6 @@ namespace xrFPServer
         private void EnrollmentWindow_Closed(object sender, EventArgs e)
         {
             Stop();
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("1");
-            stream.Write(msg, 0, msg.Length);
-            this.Close();
         }
 
         private void EnrollmentWindow_Loaded(object sender, RoutedEventArgs e)
@@ -185,7 +180,7 @@ namespace xrFPServer
 
         private int matching()
         {
-            for (int i=0; i<mydata.userNum; i++)
+            for (int i = 0; i < mydata.userNum; i++)
             {
                 if (mydata.tempName == mydata.userList[i].username)
                     return i;
@@ -283,6 +278,5 @@ namespace xrFPServer
         private DPFP.Processing.Enrollment Enroller;
         private DPFP.Capture.Capture Capturer;
         private Data mydata;
-        private NetworkStream stream;
     }
 }

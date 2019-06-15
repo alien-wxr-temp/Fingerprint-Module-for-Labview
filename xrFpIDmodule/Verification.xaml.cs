@@ -1,23 +1,24 @@
 ﻿using System;
 using System.Windows;
-using System.Net.Sockets;
 
-namespace xrFPServer
+namespace xrFpIDmodule
 {
     /// <summary>
     /// Interaction logic for Verification.xaml
     /// </summary>
     public partial class Verification : Window, DPFP.Capture.EventHandler
     {
+        #region <Member>
         private Data mydata;
-        private NetworkStream stream;
         private DPFP.Verification.Verification Verificator;
-        public Verification(Data data, NetworkStream Stream)
+        private DPFP.Capture.Capture Capturer;
+        #endregion </Member>
+
+        public Verification(Data data)
         {
             InitializeComponent();
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             mydata = data;
-            stream = Stream;
         }
 
         protected void Process(DPFP.Sample Sample)
@@ -41,18 +42,13 @@ namespace xrFPServer
                     if (result.Verified)
                     {
                         MakeReport("The fingerprint was VERIFIED.");
-                        string msg = "1" + string.Format("{0:00}", mydata.serialName[i].Length) + mydata.serialName[i];
-                        byte[] msg2 = System.Text.Encoding.ASCII.GetBytes(msg);
-                        stream.Write(msg2, 0, msg2.Length);
-                        this.Close();
+                        MakeReport("Welcome! " + mydata.serialName[i]);
                         break;
                     }
                 }
                 if (!result.Verified)
                 {
                     MakeReport("The fingerprint was NOT VERIFIED.");
-                    byte[] msg2 = System.Text.Encoding.ASCII.GetBytes("0");
-                    stream.Write(msg2, 0, msg2.Length);
                 }
 
                 mydata.Update();
@@ -67,7 +63,6 @@ namespace xrFPServer
 
         protected void Init()
         {
-            this.closeAndSaveButton.IsEnabled = false;
             this.statusTextBox.Clear();
             Verificator = new DPFP.Verification.Verification();     // Create a fingerprint template verificator
             UpdateStatus(0);
@@ -121,8 +116,7 @@ namespace xrFPServer
         private void VerificationWindow_Closed(object sender, EventArgs e)
         {
             Stop();
-            byte[] msg = System.Text.Encoding.ASCII.GetBytes("0");
-            stream.Write(msg, 0, msg.Length);
+            this.Close();
         }
 
         private void VerificationWindow_Loaded(object sender, RoutedEventArgs e)
@@ -131,9 +125,9 @@ namespace xrFPServer
             Start();
         }
 
-        private void CloseAndSaveButton_Click(object sender, RoutedEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-
+            VerificationWindow_Closed(null, null);
         }
         #endregion
 
@@ -198,22 +192,16 @@ namespace xrFPServer
         {
             this.Dispatcher.Invoke(new Action(delegate () {
                 promptTextBox.Text = prompt;
-                if (prompt == "Click Close, and then click Fingerprint Verification.")
-                {
-                    this.closeAndSaveButton.IsEnabled = true;
-                    CloseAndSaveButton_Click(null, null);
-                }
             }));
         }
         protected void MakeReport(string message)
         {
             this.Dispatcher.Invoke(new Action(delegate () {
                 statusTextBox.AppendText(message + "\r\n");
+                statusTextBox.ScrollToEnd();
             }));
         }
 
-        private DPFP.Capture.Capture Capturer;
-
-       
+        
     }
 }
