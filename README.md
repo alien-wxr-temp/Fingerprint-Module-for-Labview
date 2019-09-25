@@ -1,5 +1,5 @@
-# Taurus-xrFPmodule
-A Fingerprint module
+# Fingerprint Module for Labview
+A Fingerprint Module for Labview
 # Log
 ## *[2019-04-22 Monday]*
 - Got familiar with the two samples based on **C#**.
